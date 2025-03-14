@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Sharing Platform</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-image: url(me/Library-Management-1024x683.jpg);background-position: center; background-size: cover; background-repeat: no-repeat; background-color: #f4f4f9; margin: 0; padding: 0; color: #333; }
+        header { background-color: #4CAF50; padding: 10px; text-align: center; color: white; }
+        #bookContainer { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px; }
+        .book { background-color: white; border-radius: 8px; padding: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); text-align: center; }
+        .hidden { display: none; }
+        footer { text-align: center; margin-top: 20px; background-color: #101110; color: white; padding: 10px; }
+        button { background-color: #4CAF50; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+    <div class="rd-navbar-nav-wrap" style="width: 100%; text-align: center; height: 100px; background-color:lightblue; display: inline-block;">
+        <!-- RD Navbar Nav-->
+        <ul class="rd-navbar-nav" style="text-decoration: none; " >
+          <li class="rd-nav-item" style="display: inline-block;" ><a class="rd-nav-link" style="font-size: 20px;  text-decoration: none; font-size: bold"; href="index.html">صفحه اصلی</a>
+          </li>
+          <li class="rd-nav-item" style="display: inline-block;padding: 10px;"><a class="rd-nav-link" style="font-size: 20px;  text-decoration: none; font-size: bold"; href="about-us.html">در باره ما</a>
+          </li>
+          <li class="rd-nav-item active" style="display: inline-block;padding: 10px;"><a class="rd-nav-link" style="font-size: 20px; font-size: bold; text-decoration: none;  ";  href="typography.html">دوره های آموزشی</a>
+          </li>
+          <li class="rd-nav-item" style="display: inline-block;padding: 10px;"><a class="rd-nav-link" style="font-size: 20px; text-decoration: none; font-size: bold"; href="contacts.html">راه ارتباطی با ما</a>
+          </li>
+          <li class="rd-nav-item" style="display: inline-block;padding: 10px;"><a class="rd-nav-link" style="font-size: 20px; text-decoration: none; font-size: bold"; href="story.html">داستان های برای اطفال</a>
+          </li>
+          <li class="rd-nav-item" style="display: inline-block;padding: 10px;"><a class="rd-nav-link" style="font-size: 20px; text-decoration: none; font-size: bold"; href="library.html">کتاب خانه مکتب</a>
+          </li>
+          <li class="rd-nav-item" style="display: inline-block;padding: 10px;"><a class="rd-nav-link" style="font-size: 20px; text-decoration: none; font-size: bold"; href="history.html">تاریخچه</a>
+          </li>
+      </div>
+    </div><a class="button button-primary button-sm" href="https://t.me/AwaiKetabPES">کانال تلگرام</a>
+  </div>
+    <header>
+        <h1>Welcome to Book Sharing</h1>
+        <nav>
+            <button onclick="showAdminLogin()">Admin Login</button>
+            <input type="text" id="searchInput" placeholder="Search books..." oninput="searchBooks()">
+        </nav>
+    </header>
+
+    <main>
+        <section id="bookContainer">
+            <!-- Books will be dynamically added here -->
+        </section>
+
+        <section id="adminLogin" class="hidden">
+            <input type="text" id="adminUsername" placeholder="Username" />
+            <input type="password" id="adminPassword" placeholder="Password" />
+            <button onclick="loginAdmin()">Login</button>
+            <p id="loginError" class="hidden">Invalid credentials</p>
+        </section>
+
+        <section id="adminBookSection" class="hidden">
+            <input type="text" id="bookTitle" placeholder="Book Title" />
+            <textarea id="bookDescription" placeholder="Book Description"></textarea>
+            <input type="file" id="bookFile" accept="application/pdf" />
+            <button onclick="addBook()">Add Book</button>
+        </section>
+    </main>
+
+    <footer style="margin-top: 400px;">
+        <p><span>&copy;&nbsp;</span><span class="copyright-year"></span><span>&nbsp;</span><span>Radmanish</span><span>.&nbsp;</span><span>All Rights Reserved.</span><span>&nbsp;</span>Design  by sebghatullah Radmanish "0790671858 "</a></p>
+    </footer>
+
+    <script>
+        const storedBooks = JSON.parse(localStorage.getItem('books')) || [];
+        let isAdmin = false;
+
+        function showAdminLogin() {
+            document.getElementById('adminLogin').classList.toggle('hidden');
+        }
+
+        function loginAdmin() {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+
+            if (username === 'admin' && password === '1234') {
+                isAdmin = true;
+                document.getElementById('adminLogin').classList.add('hidden');
+                document.getElementById('adminBookSection').classList.remove('hidden');
+                loadBooks();
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        }
+
+        function addBook() {
+            const title = document.getElementById('bookTitle').value;
+            const description = document.getElementById('bookDescription').value;
+            const file = document.getElementById('bookFile').files[0];
+
+            if (title && description && file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const newBook = { title, description, file: e.target.result };
+                    storedBooks.push(newBook);
+                    localStorage.setItem('books', JSON.stringify(storedBooks));
+                    loadBooks();
+                    document.getElementById('bookTitle').value = '';
+                    document.getElementById('bookDescription').value = '';
+                    document.getElementById('bookFile').value = '';
+                    
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please fill in all fields');
+            }
+        }
+
+        function loadBooks() {
+            const container = document.getElementById('bookContainer');
+            container.innerHTML = '';
+            storedBooks.forEach((book, index) => {
+                const div = document.createElement('div');
+                div.classList.add('book');
+                div.innerHTML = `
+                    <h3>${book.title}</h3>
+                    <p>${book.description}</p>
+                    <a href="${book.file}" target="_blank"><button>download</button></a>
+                    ${isAdmin ? `<button onclick="deleteBook(${index})">Delete</button>` :
+                     ''}
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function searchBooks() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filteredBooks = storedBooks.filter(book => 
+                book.title.toLowerCase().includes(query) || 
+                book.description.toLowerCase().includes(query)
+            );
+            const container = document.getElementById('bookContainer');
+            container.innerHTML = '';
+            filteredBooks.forEach(book => {
+                const div = document.createElement('div');
+                div.classList.add('book');
+                div.innerHTML = `
+                    <h3>${book.title}</h3>
+                    <p>${book.description}</p>
+                    <a href="${book.file}" target="_blank"><button>View Book</button></a>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function deleteBook(index) {
+            if (confirm("Are you sure you want to delete this book?")) {
+                storedBooks.splice(index, 1);
+                localStorage.setItem('books', JSON.stringify(storedBooks));
+                loadBooks();
+            }
+        }
+
+        loadBooks();
+    </script>
+
+</body>
+</html>
